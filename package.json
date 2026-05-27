@@ -8,9 +8,14 @@
     "dev": "node server.js",
     "start": "node server.js",
     "test": "node tests/smoke.test.js",
-    "check": "node tests/static-check.js"
+    "check": "node tests/static-check.js",
+    "build": "npm run check"
   },
-  "engines": { "node": ">=20" },
-  "dependencies": { "ethers": "^6.15.0" },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "ethers": "^6.15.0"
+  },
   "devDependencies": {}
 }
