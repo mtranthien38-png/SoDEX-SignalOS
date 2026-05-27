@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#050816" />
+  <title>SoDEX SignalOS — Wave 2</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/logo.png" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="noise"></div>
+  <aside class="sidebar">
+    <div class="brand"><img class="brand-logo" src="/logo.png" alt="SoDEX SignalOS logo" /><div><b>SoDEX SignalOS</b><small>SoSoValue × SoDEX</small></div></div>
+    <nav>
+      <a href="#command" class="active">Command Center</a>
+      <a href="#markets">SoDEX Markets</a>
+      <a href="#news">News Radar</a>
+      <a href="#flows">ETF Flow</a>
+      <a href="#agent">Signal Agent</a>
+      <a href="#terminal">Execution</a>
+      <a href="#pitch">Wave 2 Pitch</a>
+    </nav>
+    <div class="side-card">
+      <span class="pill live-dot" id="health-pill">checking...</span>
+      <p>API keys stay server-side. Paper mode is default for judging safety.</p>
+    </div>
+  </aside>
+
+  <main class="app">
+    <header class="hero" id="command">
+      <div>
+        <p class="eyebrow">WaveHack Wave 2 · One-person on-chain finance business</p>
+        <h1>SoDEX SignalOS turns SoSoValue intelligence into guarded on-chain execution workflows.</h1>
+        <p class="lede">A one-person finance operating system: market intelligence, signal scoring, risk guardrails, and SoDEX-ready paper execution in one polished dashboard.</p>
+        <div class="hero-actions">
+          <button class="primary" id="run-agent">Run Alpha Agent</button>
+          <button class="ghost" id="refresh-all">Refresh Data</button>
+        </div>
+      </div>
+      <section class="glass hero-panel">
+        <div class="panel-top"><span>System status</span><b id="mode">—</b></div>
+        <div class="status-grid" id="status-grid"></div>
+      </section>
+    </header>
+
+    <section class="kpis" id="kpis"></section>
+
+    <section class="grid two" id="markets">
+      <article class="glass">
+        <div class="section-title"><span>SoDEX Market Tape</span><button class="mini" data-refresh="sodex">refresh</button></div>
+        <div class="table-wrap"><table><thead><tr><th>Pair</th><th>Last</th><th>24h</th><th>Volume</th><th>Spread</th></tr></thead><tbody id="ticker-table"></tbody></table></div>
+      </article>
+      <article class="glass">
+        <div class="section-title"><span>Market Pulse</span><span class="pill">microstructure</span></div>
+        <canvas id="pulse-chart" height="210"></canvas>
+        <div class="caption">Normalized SoDEX price/volume radar. Demo fallback is used when API is unavailable.</div>
+      </article>
+    </section>
+
+    <section class="grid two" id="news">
+      <article class="glass tall">
+        <div class="section-title"><span>SoSoValue News Radar</span><button class="mini" data-refresh="news">refresh</button></div>
+        <div id="news-list" class="news-list"></div>
+      </article>
+      <article class="glass tall" id="flows">
+        <div class="section-title"><span>ETF / Index Flow</span><select id="asset-select"><option>BTC</option><option>ETH</option><option>SOL</option><option>SOSO</option></select></div>
+        <canvas id="flow-chart" height="270"></canvas>
+        <div id="etf-list" class="etf-list"></div>
+      </article>
+    </section>
+
+    <section class="grid two" id="agent">
+      <article class="glass signal-card">
+        <div class="section-title"><span>Alpha Signal Studio</span><span id="signal-time" class="muted">not run yet</span></div>
+        <div class="score-ring"><div><b id="score">—</b><small>signal score</small></div></div>
+        <h2 id="action">Waiting for data</h2>
+        <p id="confidence">Run the agent to produce a transparent SoSoValue + SoDEX trading thesis.</p>
+        <div class="component-bars" id="component-bars"></div>
+      </article>
+      <article class="glass">
+        <div class="section-title"><span>Reasoning Trace</span><span class="pill">explainable</span></div>
+        <ol id="rationale" class="rationale"></ol>
+        <div class="order-preview" id="order-preview"></div>
+      </article>
+    </section>
+
+    <section class="glass terminal" id="terminal">
+      <div class="section-title"><span>Guarded SoDEX Execution Terminal</span><span class="pill safe">paper by default</span></div>
+      <div class="terminal-grid">
+        <form id="order-form">
+          <label>Symbol<input name="symbol" value="vBTC_vUSDC" /></label>
+          <label>Side<select name="side"><option>buy</option><option>sell</option></select></label>
+          <label>Quantity<input name="quantity" value="0.002" /></label>
+          <label>Price<input name="price" value="108240" /></label>
+          <label>Mode<select name="mode"><option value="paper">paper</option><option value="live">live (blocked unless enabled)</option></select></label>
+          <button class="primary" type="submit">Submit Order</button>
+        </form>
+        <pre id="terminal-log">$ terminal ready\n$ live trading guard: ON\n</pre>
+      </div>
+    </section>
+
+    <section class="glass pitch" id="pitch">
+      <p class="eyebrow">Buildathon pitch</p>
+      <h2>Why this satisfies Wave 2</h2>
+      <div class="pitch-grid">
+        <div><b>Practical impact</b><p>A solo operator can run a finance newsletter, alert desk, paper trading lab and execution workflow from one dashboard.</p></div>
+        <div><b>Functionality</b><p>Live/fallback API adapters, health checks, signal scoring, order terminal, and deployable server routes.</p></div>
+        <div><b>Logic workflow</b><p>SoSoValue data → normalization → alpha scoring → SoDEX market validation → guarded order.</p></div>
+        <div><b>Data/API integration</b><p>Server-side SoSoValue + SoDEX clients keep secrets out of the browser.</p></div>
+        <div><b>UX clarity</b><p>Dark trading-desk interface with clear status labels, source visibility, and reasoning trace.</p></div>
+      </div>
+    </section>
+  </main>
+  <script src="/app.js" type="module"></script>
+</body>
+</html>

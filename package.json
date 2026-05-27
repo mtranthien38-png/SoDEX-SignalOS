@@ -1,0 +1,16 @@
+{
+  "name": "sodex-signalos",
+  "version": "2.0.0",
+  "private": true,
+  "description": "SoDEX SignalOS: one-person on-chain finance operating system for WaveHack Wave 2 using SoSoValue and SoDEX APIs.",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "test": "node tests/smoke.test.js",
+    "check": "node tests/static-check.js"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": { "ethers": "^6.15.0" },
+  "devDependencies": {}
+}
