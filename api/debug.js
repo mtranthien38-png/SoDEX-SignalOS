@@ -1,34 +1,20 @@
-import { config, redact } from '../src/core/env.js';
-import { json } from '../src/core/http.js';
-
-async function handle() {
-  const cfg = config();
-  return {
+function redact(v){ if(!v) return ''; v=String(v); return v.length<=8?'••••':`${v.slice(0,4)}••••${v.slice(-4)}`; }
+module.exports = function handler(req, res) {
+  res.setHeader('content-type', 'application/json; charset=utf-8');
+  res.setHeader('cache-control', 'no-store');
+  res.statusCode = 200;
+  res.end(JSON.stringify({
     ok: true,
+    runtime: 'vercel-commonjs',
     node: process.version,
-    runtime: process.env.VERCEL ? 'vercel' : 'local',
     env: {
-      MOCK_MODE: String(process.env.MOCK_MODE || ''),
-      SOSOVALUE_API_KEY: redact(cfg.sosovalue.key),
-      SOSOVALUE_BASE_URL: cfg.sosovalue.baseUrl,
-      SODEX_NETWORK: cfg.sodex.network,
-      SODEX_PERPS_BASE_URL: cfg.sodex.perpsBaseUrl,
-      SODEX_SPOT_BASE_URL: cfg.sodex.spotBaseUrl,
-      SODEX_API_KEY_NAME: cfg.sodex.apiKeyName || '',
-      SODEX_API_PUBLIC_KEY: cfg.sodex.apiPublicKey || '',
-      SODEX_API_PRIVATE_KEY_CONFIGURED: Boolean(cfg.sodex.apiPrivateKey),
-      SODEX_LIVE_TRADING: cfg.sodex.liveTrading
+      MOCK_MODE: process.env.MOCK_MODE || null,
+      SOSOVALUE_API_KEY: process.env.SOSOVALUE_API_KEY ? redact(process.env.SOSOVALUE_API_KEY) : null,
+      SODEX_NETWORK: process.env.SODEX_NETWORK || null,
+      SODEX_API_KEY_NAME: process.env.SODEX_API_KEY_NAME || null,
+      SODEX_API_PUBLIC_KEY: process.env.SODEX_API_PUBLIC_KEY ? redact(process.env.SODEX_API_PUBLIC_KEY) : null,
+      SODEX_API_PRIVATE_KEY: process.env.SODEX_API_PRIVATE_KEY ? 'set' : null,
+      SODEX_LIVE_TRADING: process.env.SODEX_LIVE_TRADING || null
     }
-  };
-}
-
-export default async function handler(req, res) {
-  try {
-    const payload = await handle(req, res);
-    if (res && !res.writableEnded) return json(res, 200, payload);
-    return payload;
-  } catch (error) {
-    if (res && !res.writableEnded) return json(res, error.status || 500, { ok: false, error: error.message || String(error), details: error.details || null });
-    throw error;
-  }
-}
+  }, null, 2));
+};

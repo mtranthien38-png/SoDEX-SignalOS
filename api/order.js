@@ -1,25 +1,3 @@
-import { config } from '../src/core/env.js';
-import { readBody, json } from '../src/core/http.js';
-import { sodexClient } from '../src/clients/sodex.js';
-import { assertOrderInput } from '../src/core/validate.js';
-
-async function handle(req) {
-  if (req.method !== 'POST') return { ok: false, error: 'POST required' };
-  const body = assertOrderInput(await readBody(req));
-  const cfg = config();
-  const client = sodexClient({ ...cfg.sodex, mockMode: cfg.mockMode });
-  if (body.mode === 'live') return client.liveOrder(body);
-  const order = await client.paperOrder(body);
-  return { ok: true, data: order };
-}
-
-export default async function handler(req, res) {
-  try {
-    const payload = await handle(req, res);
-    if (res && !res.writableEnded) return json(res, payload?.ok === false ? 400 : 200, payload ?? { ok: true });
-    return payload;
-  } catch (error) {
-    if (res && !res.writableEnded) return json(res, error.status || 500, { ok: false, error: error.message || String(error), details: error.details || null });
-    throw error;
-  }
-}
+function json(res,p){ res.setHeader('content-type','application/json; charset=utf-8'); res.setHeader('cache-control','no-store'); res.statusCode=200; res.end(JSON.stringify(p,null,2)); }
+function read(req){ return new Promise(resolve=>{ if(req.body&&typeof req.body==='object') return resolve(req.body); if(typeof req.body==='string'){try{return resolve(JSON.parse(req.body||'{}'))}catch{return resolve({})}} let b=''; req.on&&req.on('data',c=>b+=c); req.on&&req.on('end',()=>{try{resolve(JSON.parse(b||'{}'))}catch{resolve({})}}); if(!req.on) resolve({}); }); }
+module.exports = async function handler(req,res){ const body=await read(req); const mode=body.mode||'paper'; if(mode!=='paper'&&String(process.env.SODEX_LIVE_TRADING).toLowerCase()!=='true') return json(res,{ok:false,blocked:true,message:'Live trading is blocked. Keep paper mode for demo unless testnet signing has been fully verified.'}); const q=Number(body.quantity||0), p=Number(body.price||0); return json(res,{ok:true,data:{id:`paper_${Date.now()}`,mode:'paper',status:'accepted',symbol:body.symbol||'vBTC_vUSDC',side:body.side||'buy',quantity:q,price:p,notional:+(q*p).toFixed(2),createdAt:new Date().toISOString()}}); };
