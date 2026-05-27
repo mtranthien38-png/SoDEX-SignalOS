@@ -6,9 +6,25 @@ const state = { tickers: [], news: [], etfs: [], history: [], signal: null, asse
 
 async function api(path, opts = {}) {
   const res = await fetch(path, { headers: { 'content-type': 'application/json' }, ...opts });
-  const data = await res.json();
-  if (!res.ok && data?.ok !== false) throw new Error(`API error ${res.status}`);
+  const text = await res.text();
+  let data;
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    throw new Error(`API ${path} returned non-JSON: ${text.slice(0, 120)}`);
+  }
+  if (!res.ok) throw new Error(data?.error || `API error ${res.status} on ${path}`);
   return data;
+}
+
+function showApiError(area, error) {
+  const message = String(error?.message || error || 'Unknown API error');
+  if (area === 'status') {
+    $('#mode').textContent = 'api error';
+    $('#health-pill').textContent = 'api error';
+    $('#status-grid').innerHTML = `<div class="status-item"><small>debug</small><b>API route failed</b><small>${message}</small></div>`;
+  }
+  $('#terminal-log').textContent += `\n$ api error [${area}]\n${message}\n`;
 }
 
 function setActiveNav() {
@@ -120,12 +136,12 @@ function renderSignal() {
   }
 }
 
-async function loadStatus() { renderStatus(await api('/api/status')); }
-async function loadSodex() { const r = await api('/api/sodex?market=perps&resource=tickers'); state.tickers = r.data || []; renderTickers(); renderKPIs(); }
-async function loadNews() { const r = await api('/api/sosovalue?resource=news'); state.news = r.data || []; renderNews(); }
-async function loadFlows() { const [e, h] = await Promise.all([api(`/api/sosovalue?resource=etfs&symbol=${state.asset}`), api(`/api/sosovalue?resource=etf-history&symbol=${state.asset}`)]); state.etfs = e.data || []; state.history = h.data || []; renderFlows(); renderKPIs(); }
-async function runAgent() { const r = await api('/api/signal', { method: 'POST', body: JSON.stringify({ asset: state.asset }) }); state.signal = r.data; renderSignal(); renderKPIs(); }
-async function refreshAll() { await Promise.all([loadStatus(), loadSodex(), loadNews(), loadFlows()]); }
+async function loadStatus() { try { renderStatus(await api('/api/status')); } catch (error) { showApiError('status', error); } }
+async function loadSodex() { try { const r = await api('/api/sodex?market=perps&resource=tickers'); state.tickers = r.data || []; renderTickers(); renderKPIs(); } catch (error) { showApiError('sodex', error); } }
+async function loadNews() { try { const r = await api('/api/sosovalue?resource=news'); state.news = r.data || []; renderNews(); } catch (error) { showApiError('sosovalue-news', error); } }
+async function loadFlows() { try { const [e, h] = await Promise.all([api(`/api/sosovalue?resource=etfs&symbol=${state.asset}`), api(`/api/sosovalue?resource=etf-history&symbol=${state.asset}`)]); state.etfs = e.data || []; state.history = h.data || []; renderFlows(); renderKPIs(); } catch (error) { showApiError('sosovalue-flows', error); } }
+async function runAgent() { try { const r = await api('/api/signal', { method: 'POST', body: JSON.stringify({ asset: state.asset }) }); state.signal = r.data; renderSignal(); renderKPIs(); } catch (error) { showApiError('signal', error); } }
+async function refreshAll() { await Promise.allSettled([loadStatus(), loadSodex(), loadNews(), loadFlows()]); }
 
 $('#run-agent').addEventListener('click', runAgent);
 $('#refresh-all').addEventListener('click', refreshAll);
