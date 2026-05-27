@@ -1,4 +1,4 @@
-# SoDEX SignalOS — Wave 2
+# SoDEX SignalOS
 
 ## Product name
 
