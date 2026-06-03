@@ -1,5 +1,4 @@
-# SoDEX SignalOS — Wave 2
-
+# SoDEX SignalOS
 ## Product name
 
 **SoDEX SignalOS** — an operating system for turning SoSoValue intelligence into safer SoDEX execution workflows.
